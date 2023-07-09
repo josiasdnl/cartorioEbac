@@ -56,7 +56,7 @@ int consulta() //Função destinada a buscar usuários que já fazem parte do sistem
 	
 	setlocale(LC_ALL,"Portuguese");
 	
-	printf("Digite o CPF a ser consultado: "); //Primer key: CPF
+	printf("Digite o CPF a ser consultado: "); 
 	scanf("%s", cpf);
 	
 	system("cls");
@@ -157,7 +157,8 @@ int main() //Menu Principal
 		printf("Escolha uma das opções abaixo: \n\n");
 		printf("\t1 - Registrar nomes\n");
 		printf("\t2 - Consultar nomes\n");
-		printf("\t3 - Deletar nomes\n\n");
+		printf("\t3 - Deletar nomes\n");
+		printf("\t4 - Sair do sistema\n\n");
 		printf("Opção: ");
 		scanf("%d", &opcao); //Fim do menu
 	
@@ -175,6 +176,11 @@ int main() //Menu Principal
 			
 			case 3:
 			deletar();
+			break;
+			
+			case 4:
+			printf("Obrigado por utilizar nosso sistema.\n\n");
+			return 0;
 			break;
 			
 			default:
