@@ -1,192 +1,316 @@
-#include <stdio.h>  //biblioteca de comunicação com o usuário (io = input/output)
-#include <stdlib.h> //biblioteca de alocação de espaço em memória
-#include <locale.h> //biblioteca de alocação de texto por região
-#include <string.h> //biblioteca responsável pelas strings
+#include <stdio.h>	//Comunicação com o usuário (input/output)
+#include <stdlib.h>	//Alocação de espaço em memória
+#include <locale.h>	//Localização de idioma por região
+#include <string.h>	//Manipulação de strings
 
-int registro() //Função destinada a registrar novos usuários no sistema
-{
-	char arquivo [40];
-	char cpf [40];
-	char nome [40];
-	char sobrenome [40];
-	char cargo [40];
-	
-	setlocale(LC_ALL,"Portuguese");
-	
-	printf("Digite o CPF a ser cadastrado: "); //Início do questionário para coleta de informações do usuário
-	scanf("%s", cpf);
-	
-	strcpy(arquivo, cpf); //Copia valores das strings
-	
-	FILE *fp;
-	fp = fopen(arquivo,"w"); //Abrir (criar) arquivo ("w": write)
-	fprintf(fp,"\tCPF: %s \n", cpf); //Salvar valor da variável no arquivo
-	fclose(fp); //Fechar arquivo
+#define MAX_USUARIOS 100 //Máximo de elementos que a array "usuario" poderá armazenar
 
-	printf("Digite o nome a ser cadastrado: ");
-	scanf("%s",nome);
-	
-	fp = fopen(arquivo,"a"); //Abrir ("a": append)
-	fprintf(fp,"\tNome completo: %s ",nome);
-	fclose(fp); //Fechar
-	
-	printf("Digite o sobrenome a ser cadastrado: ");
-	scanf("%s",sobrenome);
-	
-	fp = fopen(arquivo,"a");
-	fprintf(fp,"%s \n",sobrenome);
-	fclose(fp);
-	
-	printf("Digite o cargo da pessoa a ser cadastrada: ");
-	scanf("%s",cargo);
-	
-	fp = fopen(arquivo,"a");
-	fprintf(fp,"\tCargo: %s \n",cargo);
-	fclose(fp);
+//Estrutura de dados que irá receber as variáveis "email" e "senha"
+typedef struct { 
+	char email[20];
+	char senha[20];
+} dadosDeLogin; //Nome atribuído à estrutura
 
-	printf("\n\n");
+//Criação de uma array nomeada "usuarios" para receber os dados da estrutura "dadosDeLogin" obedecendo ao limite de 100 usuários
+dadosDeLogin usuarios[MAX_USUARIOS];  
+int numUsuario=0; //Contador
 
+int criarConta() {
+	
+	if(numUsuario >= MAX_USUARIOS) {
+		printf("\n\n!!! Limite de usuários atingido \n\n\n");
+		return;
+	}
+	
+	//Solicitação dos dados para criar nova conta
+	printf("-------------------------------------------------------\n");
+   	printf("\t\tCRIE UMA CONTA \n");
+ 	printf("-------------------------------------------------------\n\n");
+ 	printf("Digite os dados solicitados abaixo: \n");
+ 	
+	 printf("\tEmail: ");
+ 	scanf("%s", usuarios[numUsuario].email);
+ 	
+ 	printf("\tSenha: ");
+ 	scanf("%s", usuarios[numUsuario].senha);
+	
+	//Verificar se o email já está cadastrado no sistema
+ 	int i=0;
+ 	for(i=0; i < numUsuario; i++) {
+ 		if (strcmp(usuarios[i].email, usuarios[numUsuario].email) == 0) { //Caso o email já esteja no sistema, o valor do retorno será 0
+ 			printf("\n\n !!! Esse usuário já está cadastrado no sistema. Faça login ou tente novamente. \n\n\n");
+ 			system("pause");
+ 			return;
+		 }
+	}
+ 	
+ 	printf("\n\nCadastro realizado com sucesso! \n\n\n");
+	
+	numUsuario++; //Incremento do contador
+	
 	system("pause");
 }
 
-int consulta() //Função destinada a buscar usuários que já fazem parte do sistema
-{
-	char cpf[40];
-	char cadastro[200];
+int fazerLogin() {
+	char email[20];
+	char senha[20];
 	
-	setlocale(LC_ALL,"Portuguese");
+	printf("-------------------------------------------------------\n");
+   	printf("\t\t\tLOGIN \n");
+ 	printf("-------------------------------------------------------\n\n");
 	
-	printf("Digite o CPF a ser consultado: "); 
-	scanf("%s", cpf);
-	
-	system("cls");
-	
-	FILE *fp;
-	fp = fopen(cpf, "r");
-	
-	if(fp == NULL){
-		printf("O CPF digitado não está cadastrado no sistema. \n");
-	}
-		else{
-			printf("Informações do Registro: \n\n");	
-		}
-	
-	while(fgets(cadastro,200,fp) != NULL){ //Busca informações associadas ao CPF digitado
-			printf("%s", cadastro);
-	}
-	
-	fclose(fp);
-	
-	printf("\n\n");
-	
-	system("pause");
-	
+	// Solicitar email e senha
+    printf("Email: ");
+    scanf("%s", email);
+
+    printf("Senha: ");
+    scanf("%s", senha);
+
+    // Verificar se o email e a senha correspondem a um cadastro válido
+    int i;
+	for (i = 0; i < numUsuario	; i++) {
+        if (strcmp(usuarios[i].email, email) == 0 && strcmp(usuarios[i].senha, senha) == 0) {
+        	system("cls");
+        	printf("\n\nConectando à sua conta... \n\n\n");
+        	system("pause");
+            return 1; // Login bem-sucedido
+        }
+    }
+
+    printf("\n\n!!! Usuário ou senha inválidos.\n\n");
+    system("pause");
+    return 0; // Login falhou
 }
 
-int deletar() //Função para deletar usuários
-{
-	char cpf[40];
-	char cadastro[200];
+int telaLogin() {
 	int opcao=0;
+	int i=1;
 	
-	setlocale(LC_ALL,"Portuguese");
-	
-	printf("Para apagar um usuário do sistema, digite seu CPF: ");
-	scanf("%s",cpf);
+	for(i=1; i==1; ) {
 
-	system("cls");
-
-	FILE *fp;
-	fp = fopen(cpf, "r");
+		system("cls");
 	
-	
-	if(fp == NULL){
-		printf("O CPF digitado não está cadastrado no sistema. \n\n");
-	}
-		else{	
-		
-		printf("Informações do Registro: \n\n");
-		
-		while(fgets(cadastro,200,fp) != NULL){ //Exibe informações do usuário
-			printf("%s", cadastro);
-		}
-			
-		printf("\nTem certeza de que deseja deletar todas as informações do usuário? \n"); //Solicita confirmação antes de excluir
-		printf("\t1 - Sim \n");
-		printf("\t2 - Não \n\n");
+		printf("---------------------------------------------------------------- \n");
+		printf("\t\tÉ BOM VER VOCÊ POR AQUI DE NOVO! \n");
+		printf("Sistema interno de registro para alunos e colaboradores da EBAC \n");
+		printf("---------------------------------------------------------------- \n\n");
+		printf("Escolha uma das opções abaixo: \n");
+		printf("\t1 - Criar conta \n");
+		printf("\t2 - Fazer login \n");
+		printf("\t3 - Fechar programa \n\n");
 		printf("Opção: ");
 		scanf("%d", &opcao);
 	
 		system("cls");
 	
-		fclose(fp);
-	
-		switch(opcao){	
-	
+		switch (opcao) {
 			case 1:
-			remove(cpf);
-			printf("Usuário deletado com sucesso! \n\n\n");
-			break;
-			
+				criarConta();
+				break;
+		
 			case 2:
-			printf("Procedimento cancelado! \n\n\n");
-			break;
-			
+				if(fazerLogin()) {
+					return; //Sai da função e vai para o Menu Principal
+				}
+				break;
+		
+			case 3:
+				printf("\n\nEncerrando sistema... \n\n\n");
+				system("pause");
+				exit(0); //Encerra o programa
+		
 			default:
-			printf("Essa opção não está disponível. \n\n\n");	
-			break;
+				printf("\n\n!!! Essa opção não está disponível. \n\n\n");
+				system("pause");
 		}
 	}
-
-	system("pause");
-	
 }
 
-int main() //Menu Principal
-{
+int registrarNomes() {
+	char arquivo[40];
+	char cpf[40];
+	char nome[40];
+	char sobrenome[40];
+	char cargo[40];
+	
+	printf("---------------------------------------------------------------- \n");
+	printf("\t\t REGISTRAR NOVO USUÁRIO \n");
+	printf("---------------------------------------------------------------- \n\n");
+	
+	//Solicitar informações ao usuário
+	//INÍCIO
+	printf("Digite os dados solicitados abaixo. \n"); 
+	printf("\t CPF: ");
+	scanf("%s", cpf);
+	
+	strcpy(arquivo, cpf); //Copia dados da string "cpf" para a string "arquivo"
+	
+	printf("\t Nome: ");
+	scanf("%s", nome);
+	printf("\t Sobrenome: ");
+	scanf("%s", sobrenome);
+	printf("\t Cargo: ");
+	scanf("%s", cargo);
+	printf("\n\n");
+	//FIM
+	
+	//Criação de um arquivo para registrar os dados coletados
+	FILE *fp;
+	fp = fopen(arquivo, "a"); //Arquivo aberto para receber os dados ("a", append)
+	fprintf(fp, "\tCPF: %s \n", cpf);
+	fprintf(fp, "\tNome completo: %s %s \n", nome, sobrenome);
+	fprintf(fp, "\tCargo: %s \n", cargo);
+	fclose(fp); //Arquivo fechado
+	
+	
+	system("cls");
+	
+	printf("\n\nNovo usuário registrado com sucesso! \n\n\n");
+	
+	system("pause");
+}
+
+int consultarNomes() {
+	char cpf[40];
+	char consulta[200];
+		
+	printf("---------------------------------------------------------------- \n");
+	printf("\t\t CONSULTAR USUÁRIOS NO SISTEMA \n");
+	printf("---------------------------------------------------------------- \n\n");
+	printf("Digite o CPF do usuário que deseja consultar: ");
+	scanf("%s", cpf);
+	
+	FILE *fp; //Acessando arquivo para leitura ("r", read)
+	fp = fopen(cpf, "r"); //ABRIR
+	
+		if(fp == NULL) {
+			printf("\n\n!!! O CPF digitado não está cadastrado no sistema. \n");
+		}
+	
+		if(fp != NULL) {
+			printf("\n\nInformações do usuário: \n");
+			
+			while(fgets(consulta, 200, fp) != NULL) {
+				printf("%s", consulta);
+			}
+		}
+
+	fclose(fp); //FECHAR
+	
+	printf("\n\n");
+	
+	system("pause");
+}
+
+int deletarNomes() {
+	char cpf[40];
+	char consulta[200];
+	int opcao;
+	
+	printf("---------------------------------------------------------------- \n");
+	printf("\t\t DELETAR USUÁRIO DO SISTEMA \n");
+	printf("---------------------------------------------------------------- \n\n");
+	printf("Para apagar as informações de um usuário, digite seu CPF: ");
+	scanf("%s", cpf);
+	
+	FILE *fp; //Acessando arquivo para leitura
+	fp = fopen(cpf, "r"); //ABRIR
+	
+		if(fp == NULL) {
+			printf("\n\n!!! O CPF digitado não está cadastrado no sistema. \n\n\n");
+		}
+		
+		else {
+			printf("\n\nInformações do usuário: \n");
+				
+			while(fgets(consulta, 200, fp) != NULL) {
+				printf("%s", consulta);
+			}
+		
+			//Solicitar confirmação antes de deletar as inofrmações
+			printf("\n\n---------------------------------------------------------------- \n\n");	
+			printf("\nTem certeza de que deseja deletar todas as informações do usuário? \n");
+			printf("\t1 - Sim \n");
+			printf("\t2 - Não \n\n");
+			printf("Opção: ");
+			scanf("%d", &opcao);
+			
+			system("cls");
+	
+	fclose(fp); //FECHAR
+	
+			switch (opcao) {
+				case 1:
+					remove(cpf);
+					printf("\n\nUsuário deletado com sucesso! \n\n\n");
+					break;
+			
+				case 2:
+					printf("\n\nProcedimento cancelado! \n\n\n");
+					break;
+			
+				default:
+					printf("\n\n!!! Essa opção não está disponível.\n\n\n");
+			}
+		}
+	
+	system("pause");
+}
+
+int menuPrincipal() {
 	int opcao=0;
 	int x=1;
-
-	setlocale(LC_ALL,"Portuguese");
 	
-	for(x=1;x=1;){ //Laço de repetição
+	for(x=1; x==1; ) { //Loop que mantém o usuário no Menu Principal enquanto ele não fizer o logout da conta
 	
-		system("cls"); //Limpa a tela toda vez que o usuário volta ao Menu Principal
-				
-		printf("### CARTÓRIO DA EBAC ###\n\n"); //Início do menu
-		printf("Escolha uma das opções abaixo: \n\n");
-		printf("\t1 - Registrar nomes\n");
-		printf("\t2 - Consultar nomes\n");
-		printf("\t3 - Deletar nomes\n");
-		printf("\t4 - Sair do sistema\n\n");
+		system("cls");
+	
+		printf("---------------------------------------------------------------- \n");
+		printf("\t\tREGISTRO DE ALUNOS E COLABORADORES \n");
+		printf("---------------------------------------------------------------- \n\n");
+		printf("Escolha uma das opções abaixo: \n");
+		printf("\t1 - Novo registro \n");
+		printf("\t2 - Consultar o sistema \n");
+		printf("\t3 - Deletar usuário \n\n");
+		printf("\t4 - Logout \n\n");
 		printf("Opção: ");
-		scanf("%d", &opcao); //Fim do menu
+		scanf("%d", &opcao);
 	
-		system("cls");							 
+		system("cls");
 	
-		switch(opcao){ //Início da condicional
-			
+		switch (opcao) {
 			case 1:
-			registro();
-			break;
-			
+				registrarNomes();
+				break;
+		
 			case 2:
-			consulta();
-			break;
-			
+				consultarNomes();
+				break;
+		
 			case 3:
-			deletar();
-			break;
-			
+				deletarNomes();
+				break;
+		
 			case 4:
-			printf("Obrigado por utilizar nosso sistema.\n\n");
-			return 0;
-			break;
+				printf("\n\nDesconectando da sua conta... \n\n\n");
+				system("pause");
+				return(0);
+				break;
 			
 			default:
-			printf("Essa opção não está disponível.\n\n");
-			system("pause");
-			break;
+				printf("\n\n!!! Essa opção não está disponível. \n\n\n");
+				system("pause");
 		}
+	}
+}
+
+int main() {
+	int x=1;
+	
+	setlocale(LC_ALL, "Portuguese");
+	
+	for(x=1; x==1; ) {
+		telaLogin();
+		menuPrincipal();
 	}
 }
